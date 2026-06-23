@@ -39,13 +39,22 @@ def _get(key: str, default: str | None = None) -> str | None:
 
 
 # ===== API キー =====
+# 回答生成 LLM (Groq) のみ。埋め込みはローカル実行のためキー不要。
 GROQ_API_KEY: str | None = _get("GROQ_API_KEY")
-GOOGLE_API_KEY: str | None = _get("GOOGLE_API_KEY")
 
 # ===== モデル設定 =====
 GROQ_MODEL: str = _get("GROQ_MODEL", "llama-3.3-70b-versatile")
-EMBED_MODEL: str = _get("EMBED_MODEL", "models/gemini-embedding-001")
-EMBED_DIM: int = int(_get("EMBED_DIM", "768"))
+# 埋め込みはローカル ONNX（fastembed）。多言語・クロスリンガル対応の小型モデル。
+EMBED_MODEL: str = _get("EMBED_MODEL", "intfloat/multilingual-e5-small")
+EMBED_DIM: int = int(_get("EMBED_DIM", "384"))
+# e5 系は取り込み/検索でプレフィックスが必須。プレフィックス不要なモデル
+# （例: paraphrase-multilingual-MiniLM-L12-v2）に切替える場合は両方を "" にする。
+EMBED_QUERY_PREFIX: str = _get("EMBED_QUERY_PREFIX", "query: ")
+EMBED_PASSAGE_PREFIX: str = _get("EMBED_PASSAGE_PREFIX", "passage: ")
+# 埋め込みのバッチサイズ。大きいほど onnxruntime の活性化メモリが急増する
+# （256で約4GB、8で約1.1GB）。低メモリ環境（Streamlit 1GB / 小型VM）でも
+# OOM しないよう小さく保つ。
+EMBED_BATCH_SIZE: int = int(_get("EMBED_BATCH_SIZE", "8"))
 
 # ===== 取得元 =====
 # 公式ドキュメントのインデックス（.md リンク一覧）。
@@ -64,9 +73,11 @@ CHROMA_COLLECTION: str = "claude_code_docs"
 # ===== RAG パラメータ =====
 # Groq 無料枠 6,000 TPM に配慮し取得件数は控えめに。
 RETRIEVAL_K: int = 4
-# Gemini 埋め込み入力上限 2,048 トークンを超えないチャンク設定。
-CHUNK_SIZE: int = 1000
-CHUNK_OVERLAP: int = 120
+# 埋め込みモデルの最大系列長を超えないチャンク設定（文字数ベース）。
+# e5-small は最大512トークン。1500文字 ≒ ~375トークンで上限内。
+# ※ MiniLM(最大128トークン) に切替える場合は ~400 文字程度まで縮めること。
+CHUNK_SIZE: int = 1500
+CHUNK_OVERLAP: int = 200
 
 
 def require(key: str) -> str:

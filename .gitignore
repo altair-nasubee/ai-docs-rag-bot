@@ -223,3 +223,6 @@ __marimo__/
 # Claude Code
 .claude/settings.local.json
 
+# RAG ランタイムキャッシュ（基準DBの data/chroma と manifest.json は同梱・コミットする）
+data/llm_cache.db
+

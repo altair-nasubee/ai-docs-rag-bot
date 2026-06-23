@@ -5,9 +5,11 @@ streamlit
 langchain
 langchain-community
 langchain-groq          # 回答生成 LLM (Groq)
-langchain-google-genai  # 埋め込み (Gemini)
 langchain-chroma        # ベクトルDB (Chroma) 連携
 langchain-text-splitters
+
+# ローカル埋め込み（ONNX・多言語）。onnxruntime は chromadb 依存で同梱される。
+fastembed
 
 # ベクトルDB
 chromadb
