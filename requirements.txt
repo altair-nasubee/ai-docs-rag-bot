@@ -1,0 +1,19 @@
+# 画面（フロント）
+streamlit
+
+# LangChain 本体と各種連携
+langchain
+langchain-community
+langchain-groq          # 回答生成 LLM (Groq)
+langchain-google-genai  # 埋め込み (Gemini)
+langchain-chroma        # ベクトルDB (Chroma) 連携
+langchain-text-splitters
+
+# ベクトルDB
+chromadb
+
+# ドキュメント取得（.md を直接取得するため HTML パーサは不要）
+requests
+
+# 環境変数（ローカルの .env 読み込み）
+python-dotenv
