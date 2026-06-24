@@ -50,7 +50,8 @@ def _render_category_help(engine: RagEngine) -> None:
 def info_view(engine: RagEngine, update_result: dict) -> None:
     """補助情報（説明・ステータス・会話クリア）を表示するビュー。"""
     st.write(
-        "Claude Code 公式ドキュメントを根拠に、日本語で質問へ回答します。"
+        "Claude Code について日本語で質問すると、Claude Code 公式ドキュメントをRAGで検索して日本語で回答します。"
+        "アプリ内部では、GroqのAIモデルを無料枠で使ってチャットの回答を作成しています。"
         "カテゴリは選ばなくても全分野から検索します。"
     )
     manifest = load_manifest() or {}
@@ -215,7 +216,7 @@ def quiz_view() -> None:
 # セグメント切替の選択肢（簡潔なラベル）。
 VIEW_QA = "💬 Q&A"
 VIEW_QUIZ = "📝 クイズ"
-VIEW_INFO = "ℹ️ 情報"
+VIEW_INFO = "ℹ️ このアプリについて"
 
 
 def main() -> None:
