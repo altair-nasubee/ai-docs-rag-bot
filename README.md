@@ -3,10 +3,11 @@ title: Claude Code ドキュメント Q&A
 emoji: 💬
 colorFrom: indigo
 colorTo: blue
-sdk: streamlit
-sdk_version: 1.58.0
-app_file: app.py
+sdk: docker
+app_port: 8501
 pinned: false
+tags:
+  - streamlit
 ---
 
 # ai-docs-rag-bot
@@ -29,7 +30,14 @@ streamlit run app.py
 
 ## デプロイ
 
-Streamlit Community Cloud（1GB）または Hugging Face Spaces（16GB・推奨）。
-Secrets に `GROQ_API_KEY` を設定。`data/`（Chroma + manifest.json）はリポジトリに同梱する。
+公開先は **Hugging Face Spaces**（CPU Basic・16GB・無料）。Secrets に `GROQ_API_KEY` を設定し、`data/`（Chroma + manifest.json + quiz.json）をリポジトリに同梱する（`data/chroma` は Git LFS）。詳細手順は [`docs/DEPLOY.md`](docs/DEPLOY.md) を参照。
 
-上部の YAML frontmatter は Hugging Face Spaces 用の設定（Streamlit Cloud では無視される）。
+上部の YAML frontmatter は Hugging Face Spaces 用の設定です。
+
+## ライセンスと帰属
+
+- 本リポジトリの **MIT ライセンスは、本プロジェクト独自の実装コード**（`app.py` などのソース）に適用されます。
+- 一方で `data/`（ベクトルDB・マニフェスト・クイズ）は **Claude Code 公式ドキュメント（© Anthropic）の内容に由来**します。ドキュメント本文の著作権は Anthropic に帰属し、MIT ライセンスはこの派生コンテンツを再ライセンスするものではありません。
+- 回答には出典リンクを併記し、公式ドキュメントページを参照できるようにしています。
+
+> このアプリは Claude Code 公式ドキュメントを学習・参照目的で RAG により利用する非公式プロジェクトです。

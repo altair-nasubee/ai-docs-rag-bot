@@ -14,8 +14,9 @@
 
 デプロイに必要な準備は概ね完了しています。
 
-- [x] `README.md` の先頭に HF Spaces 用 YAML frontmatter（`sdk: streamlit` / `sdk_version: 1.58.0` / `app_file: app.py`）
-- [x] `requirements.txt`（HF が自動インストール）
+- [x] `README.md` の先頭に HF Spaces 用 YAML frontmatter（**`sdk: docker` / `app_port: 8501`**。HF は Streamlit 単体SDKを廃止したため Docker 経由で起動）
+- [x] `Dockerfile`（依存インストール＋8501で `streamlit run app.py`。埋め込みモデルをビルド時に事前キャッシュ）／`.dockerignore`
+- [x] `requirements.txt`（Dockerfile がインストール）
 - [x] 基準データ `data/`（`data/chroma` は **Git LFS**、`manifest.json` / `quiz.json` は通常 git）が**コミット済み**
 - [x] `.gitattributes`（`data/chroma/** filter=lfs …`）
 - [x] `.gitignore` で `.env` / `secrets.toml` / `data/llm_cache.db` を除外
@@ -30,7 +31,7 @@
 1. <https://huggingface.co/join> でアカウント作成（無料）。
 2. <https://huggingface.co/settings/tokens> → **New token**。
    - Name: 任意（例 `spaces-deploy`）
-   - Type/Role: **Write**（書き込み権限・必須）
+   - Token type: **Write**（必須）を選択すると細かいPermissionsを設定せずに書き込みで設定できる。
 3. 表示された `hf_...` のトークンを控える（= `<HF_TOKEN>`）。push 時のパスワードに使います。
 
 ---
@@ -40,10 +41,12 @@
 1. <https://huggingface.co/new-space> を開く。
 2. 設定:
    - **Owner**: 自分のアカウント
-   - **Space name**: `<SPACE_NAME>`（例 `claude-code-qa`）
+   - **Space name**: `<SPACE_NAME>`（例 `ai-docs-rag-bot`）
    - **License**: 任意（例 mit）
-   - **Select the Space SDK**: **Streamlit**
+   - **Select the Space SDK**: **Docker** を選び、表示される一覧から **Streamlit** テンプレートを選ぶ
+     （HF は Streamlit 単体SDKを廃止。Docker→Streamlit が現在の正式手順。本リポジトリは `Dockerfile` と `sdk: docker` 済みなので、push 時に上書きされる）
    - **Space hardware**: **CPU basic · 2 vCPU · 16 GB · FREE**
+   - **Storage Bucket**: **Mount a bucket to this Space** は OFF のまま
    - **Visibility**: Public（無料）
 3. **Create Space** を押す。空の Space（git リポジトリ）ができます。
    - Space の URL: `https://huggingface.co/spaces/<HF_USER>/<SPACE_NAME>`
@@ -108,8 +111,8 @@ git push space main
 ## 6. ビルド＆起動を確認
 
 1. Space ページ右上のステータスが **Building → Running** になるのを待つ。
-2. うまくいかない時は **Logs**（または "App" の下のログ）でエラーを確認。
-3. **初回・コールドスタートは ~30〜60秒**かかります（埋め込みモデル e5-small ~930MB のダウンロード＋ロードのため）。
+2. **初回ビルドは数分**かかります（Docker イメージのビルド＝依存インストール＋埋め込みモデルの事前ダウンロード）。うまくいかない時は **Logs** タブでエラーを確認。
+3. モデルはイメージに焼き込まれるため、**2回目以降のコールドスタート（スリープ復帰）は実行時ダウンロードが無く高速**。
 4. アプリが表示されたら、Q&A で「Claude Code とは何か」などを質問して回答・出典が出ることを確認。
 
 ---
@@ -154,9 +157,9 @@ git push space main
 | --- | --- |
 | `GROQ_API_KEY が未設定です` エラー | STEP 5 の Secret 未設定。`GROQ_API_KEY` を Secret として登録し再起動。 |
 | 検索結果が空 / DB が読めない | `data/chroma` が LFS ポインタのまま。`git lfs ls-files` で確認し、`git push space main` で LFS 実体が上がっているか確認。 |
-| ビルドが失敗（依存関係） | `requirements.txt` を確認。HF のログでどのパッケージで落ちたか確認。 |
-| 起動が遅い（数十秒） | 初回モデルダウンロードのため正常。2回目以降は速い。スリープ（48h）復帰時も同様。 |
-| 起動のたびに少しモデルDLが走る | 揮発性FSの仕様。実害は時間のみ（埋め込みはローカルで無料）。 |
+| ビルドが失敗（依存関係） | `requirements.txt` / `Dockerfile` を確認。HF の Logs でどのステップ・パッケージで落ちたか確認。 |
+| 初回ビルドが遅い（数分） | Docker イメージのビルド（依存＋モデル事前DL）のため正常。 |
+| 8501 以外で待ち受け等のポートエラー | `Dockerfile` の `--server.port=8501` と README の `app_port: 8501` が一致しているか確認（HF は 8501 固定）。 |
 | メモリ不足 | 16GB なので通常起きない。起きたら `EMBED_BATCH_SIZE` を下げる／軽量モデル（`paraphrase-multilingual-MiniLM-L12-v2`）へ `EMBED_MODEL` 切替。 |
 
 ---
@@ -170,7 +173,7 @@ git push space main
 ## チェックリスト（最終確認）
 
 - [ ] HF アカウント＆ **write トークン**を取得した
-- [ ] **Streamlit SDK / CPU Basic** の Space を作成した
+- [ ] **Docker（Streamlit テンプレート）/ CPU Basic** の Space を作成した
 - [ ] `git push space main` 成功（LFS 実体もアップロード）
 - [ ] **`GROQ_API_KEY`** を Secret に登録した
 - [ ] ステータスが **Running**・Q&A が回答する
