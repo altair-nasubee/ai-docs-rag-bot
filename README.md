@@ -6,6 +6,7 @@ colorTo: blue
 sdk: docker
 app_port: 8501
 pinned: false
+license: mit
 tags:
   - streamlit
 ---
