@@ -4,6 +4,7 @@
 コマンドはこのリポジトリの実構成（Streamlit／Git LFS／`GROQ_API_KEY` のみ）に合わせています。
 
 > 置き換え用プレースホルダ:
+>
 > - `<HF_USER>` … あなたの Hugging Face ユーザー名
 > - `<SPACE_NAME>` … 作成する Space 名（例: `claude-code-qa`）
 > - `<HF_TOKEN>` … Hugging Face の **write 権限**アクセストークン
@@ -14,7 +15,7 @@
 
 デプロイに必要な準備は概ね完了しています。
 
-- [x] `README.md` の先頭に HF Spaces 用 YAML frontmatter（**`sdk: docker` / `app_port: 8501`**。HF は Streamlit 単体SDKを廃止したため Docker 経由で起動）
+- [x] `README.md` の先頭に HF Spaces 用 YAML frontmatter（`**sdk: docker` / `app_port: 8501`**。HF は Streamlit 単体SDKを廃止したため Docker 経由で起動）
 - [x] `Dockerfile`（依存インストール＋8501で `streamlit run app.py`。埋め込みモデルをビルド時に事前キャッシュ）／`.dockerignore`
 - [x] `requirements.txt`（Dockerfile がインストール）
 - [x] 基準データ `data/`（`data/chroma` は **Git LFS**、`manifest.json` / `quiz.json` は通常 git）が**コミット済み**
@@ -28,28 +29,28 @@
 
 ## 1. Hugging Face アカウントとアクセストークンを用意
 
-1. <https://huggingface.co/join> でアカウント作成（無料）。
-2. <https://huggingface.co/settings/tokens> → **New token**。
-   - Name: 任意（例 `spaces-deploy`）
-   - Token type: **Write**（必須）を選択すると細かいPermissionsを設定せずに書き込みで設定できる。
+1. [https://huggingface.co/join](https://huggingface.co/join) でアカウント作成（無料）。
+2. [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens) → **New token**。
+  - Name: 任意（例 `spaces-deploy`）
+  - Token type: **Write**（必須）を選択すると細かいPermissionsを設定せずに書き込みで設定できる。
 3. 表示された `hf_...` のトークンを控える（= `<HF_TOKEN>`）。push 時のパスワードに使います。
 
 ---
 
 ## 2. Space を作成する
 
-1. <https://huggingface.co/new-space> を開く。
+1. [https://huggingface.co/new-space](https://huggingface.co/new-space) を開く。
 2. 設定:
-   - **Owner**: 自分のアカウント
-   - **Space name**: `<SPACE_NAME>`（例 `ai-docs-rag-bot`）
-   - **License**: 任意（例 mit）
-   - **Select the Space SDK**: **Docker** を選び、表示される一覧から **Streamlit** テンプレートを選ぶ
-     （HF は Streamlit 単体SDKを廃止。Docker→Streamlit が現在の正式手順。本リポジトリは `Dockerfile` と `sdk: docker` 済みなので、push 時に上書きされる）
-   - **Space hardware**: **CPU basic · 2 vCPU · 16 GB · FREE**
-   - **Storage Bucket**: **Mount a bucket to this Space** は OFF のまま
-   - **Visibility**: Public（無料）
+  - **Owner**: 自分のアカウント
+  - **Space name**: `<SPACE_NAME>`（例 `ai-docs-rag-bot`）
+  - **License**: 任意（例 mit）
+  - **Select the Space SDK**: **Docker** を選び、表示される一覧から **Streamlit** テンプレートを選ぶ
+  （HF は Streamlit 単体SDKを廃止。Docker→Streamlit が現在の正式手順。本リポジトリは `Dockerfile` と `sdk: docker` 済みなので、push 時に上書きされる）
+  - **Space hardware**: **CPU basic · 2 vCPU · 16 GB · FREE**
+  - **Storage Bucket**: **Mount a bucket to this Space** は OFF のまま
+  - **Visibility**: Public（無料）
 3. **Create Space** を押す。空の Space（git リポジトリ）ができます。
-   - Space の URL: `https://huggingface.co/spaces/<HF_USER>/<SPACE_NAME>`
+  - Space の URL: `https://huggingface.co/spaces/<HF_USER>/<SPACE_NAME>`
 
 ---
 
@@ -82,11 +83,15 @@ git remote add space https://huggingface.co/spaces/<HF_USER>/<SPACE_NAME>
 
 # push（main ブランチ）
 git push space main
+
+# push が `rejected` で失敗する場合は --force で再pushする
+git push space main --force
 ```
 
 - 認証を聞かれたら **Username = `<HF_USER>` / Password = `<HF_TOKEN>`**（write トークン）。
 - 初回は LFS で `data/chroma`（約54MB）がアップロードされるため少し時間がかかります。
 - push 後、HF 側で自動的にビルドが始まります。
+- **初回 push が `rejected` で失敗したら**、STEP 9 のトラブルシューティング参照（HF の初期コミットによる分岐＝`--force`／バイナリ拒否＝画像を LFS 化）。
 
 > 毎回トークン入力を避けたい場合は、リモートURLに埋め込む方法もあります（取り扱い注意）:
 > `git remote set-url space https://<HF_USER>:<HF_TOKEN>@huggingface.co/spaces/<HF_USER>/<SPACE_NAME>`
@@ -99,9 +104,9 @@ git push space main
 
 1. Space ページ → **Settings** タブ。
 2. **Variables and secrets** → **New secret**。
-   - **Name**: `GROQ_API_KEY`
-   - **Value**: あなたの Groq API キー（`gsk_...`）
-   - 種別は **Secret**（Variable ではなく）にする。
+  - **Name**: `GROQ_API_KEY`
+  - **Value**: あなたの Groq API キー（`gsk_...`）
+  - 種別は **Secret**（Variable ではなく）にする。
 3. 保存すると Space が自動で再起動（リビルド）します。
 
 > HF の Secret は環境変数として渡されるため、`config.py` の `os.getenv("GROQ_API_KEY")` でそのまま読めます（コード変更不要）。
@@ -131,15 +136,19 @@ git push space main
 ## 8. 更新したいとき
 
 ### コードや UI を直したら
+
 ```bash
 git add -A
 git commit -m "update"
 git push space main      # （必要なら git push origin main も）
 ```
+
 push すると HF が自動で再ビルドします。
 
 ### ドキュメントの内容を最新化したいとき（基準DB再構築）
+
 揮発性FSのため、鮮度維持は**基準DBの作り直し＋コミット**で行います。
+
 ```bash
 python ingest.py --reset     # 150ページを再取り込み（ローカル・無料）
 python gen_quiz.py           # クイズも作り直す（任意）
@@ -147,20 +156,25 @@ git add data/                # chroma は LFS で更新される
 git commit -m "rebuild base DB"
 git push space main
 ```
+
 （任意）GitHub Actions で `ingest.py` を定期実行して `data/` を再コミットすれば自動化できます。
 
 ---
 
 ## 9. トラブルシューティング
 
-| 症状 | 原因・対処 |
-| --- | --- |
-| `GROQ_API_KEY が未設定です` エラー | STEP 5 の Secret 未設定。`GROQ_API_KEY` を Secret として登録し再起動。 |
-| 検索結果が空 / DB が読めない | `data/chroma` が LFS ポインタのまま。`git lfs ls-files` で確認し、`git push space main` で LFS 実体が上がっているか確認。 |
-| ビルドが失敗（依存関係） | `requirements.txt` / `Dockerfile` を確認。HF の Logs でどのステップ・パッケージで落ちたか確認。 |
-| 初回ビルドが遅い（数分） | Docker イメージのビルド（依存＋モデル事前DL）のため正常。 |
-| 8501 以外で待ち受け等のポートエラー | `Dockerfile` の `--server.port=8501` と README の `app_port: 8501` が一致しているか確認（HF は 8501 固定）。 |
-| メモリ不足 | 16GB なので通常起きない。起きたら `EMBED_BATCH_SIZE` を下げる／軽量モデル（`paraphrase-multilingual-MiniLM-L12-v2`）へ `EMBED_MODEL` 切替。 |
+
+| 症状                                                      | 原因・対処                                                                                                                                                                                                                           |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GROQ_API_KEY が未設定です` エラー                               | STEP 5 の Secret 未設定。`GROQ_API_KEY` を Secret として登録し再起動。                                                                                                                                                                          |
+| 検索結果が空 / DB が読めない                                       | `data/chroma` が LFS ポインタのまま。`git lfs ls-files` で確認し、`git push space main` で LFS 実体が上がっているか確認。                                                                                                                                   |
+| ビルドが失敗（依存関係）                                            | `requirements.txt` / `Dockerfile` を確認。HF の Logs でどのステップ・パッケージで落ちたか確認。                                                                                                                                                           |
+| 初回ビルドが遅い（数分）                                            | Docker イメージのビルド（依存＋モデル事前DL）のため正常。                                                                                                                                                                                               |
+| 8501 以外で待ち受け等のポートエラー                                    | `Dockerfile` の `--server.port=8501` と README の `app_port: 8501` が一致しているか確認（HF は 8501 固定）。                                                                                                                                       |
+| メモリ不足                                                   | 16GB なので通常起きない。起きたら `EMBED_BATCH_SIZE` を下げる／軽量モデル（`paraphrase-multilingual-MiniLM-L12-v2`）へ `EMBED_MODEL` 切替。                                                                                                                   |
+| 初回 push が `[rejected] (fetch first)` で失敗                | Space 作成時に HF が初期コミット（テンプレ）を作るため履歴が分岐。**自分のリポジトリで上書きする**: `git push space main --force`（作成直後なので失う履歴は無い）。                                                                                                                        |
+| push が `rejected … contains binary files / use Xet` で失敗 | 画像など**バイナリは LFS 必須**（小さくても不可）。`.png` 等を LFS 化して履歴も変換し、再 push する: `git lfs migrate import --include="*.png" --everything` → `git push space main --force` → `git push origin main --force`（migrate で commit が変わるため GitHub も再同期）。 |
+
 
 ---
 
@@ -172,9 +186,9 @@ git push space main
 
 ## チェックリスト（最終確認）
 
-- [ ] HF アカウント＆ **write トークン**を取得した
-- [ ] **Docker（Streamlit テンプレート）/ CPU Basic** の Space を作成した
-- [ ] `git push space main` 成功（LFS 実体もアップロード）
-- [ ] **`GROQ_API_KEY`** を Secret に登録した
-- [ ] ステータスが **Running**・Q&A が回答する
-- [ ] スマホ実機で表示・操作・出典リンクを確認した
+- [x] HF アカウント＆ **write トークン**を取得した
+- [x] **Docker（Streamlit テンプレート）/ CPU Basic** の Space を作成した
+- [x] `git push space main` 成功（LFS 実体もアップロード）
+- [x] `**GROQ_API_KEY`** を Secret に登録した
+- [x] ステータスが **Running**・Q&A が回答する
+- [x] スマホ実機で表示・操作・出典リンクを確認した
