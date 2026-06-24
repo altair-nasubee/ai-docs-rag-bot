@@ -33,15 +33,18 @@ tags:
 
 ## 📸 スクリーンショット
 
-<p align="center">
-  <img src="docs/screenshots/ai-docs-rag-bot_1.png" width="280" alt="Q&A 画面" />
-  &nbsp;&nbsp;
-  <img src="docs/screenshots/ai-docs-rag-bot_2.png" width="280" alt="クイズ画面" />
-</p>
-<p align="center"><sub>左: Q&A 画面　／　右: クイズ画面</sub></p>
+<table align="center">
+  <tr>
+    <td align="center"><img src="docs/screenshots/ai-docs-rag-bot_1.png" width="280" alt="Q&A 画面" /></td>
+    <td align="center"><img src="docs/screenshots/ai-docs-rag-bot_2.png" width="280" alt="クイズ画面" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Q&A 画面</sub></td>
+    <td align="center"><sub>クイズ画面</sub></td>
+  </tr>
+</table>
 
-
-<!-- ↑ アプリを起動して撮影した画像を docs/images/ に置いてください（qa.png / quiz.png）。 -->
+<!-- スクリーンショットは docs/screenshots/ に配置（ai-docs-rag-bot_1.png / _2.png）。 -->
 
 ---
 
