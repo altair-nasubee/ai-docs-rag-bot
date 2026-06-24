@@ -135,6 +135,32 @@ streamlit run app.py        # http://localhost:8501
 
 ---
 
+## 公式ドキュメント更新時の `data/` 更新手順
+
+Claude Code の公式ドキュメントが更新されたら、ローカルで基準データ（`data/`）を作り直してコミットします。**ローカル埋め込みなので追加コストはゼロ・数分で完了**します。
+
+```bash
+# 1. ベクトルDB（data/chroma + manifest.json）を全ページ再構築
+python ingest.py --reset
+
+# 2. クイズも作り直す（任意）
+python gen_quiz.py
+
+# 3. ローカルで表示を確認
+streamlit run app.py
+
+# 4. コミット＆ push（data/chroma は Git LFS で更新される）
+git add data/manifest.json data/quiz.json data/chroma
+git commit -m "docs: 公式ドキュメント更新を反映（基準DB再構築）"
+git push space main        # 公開先(HF Spaces)へ反映。GitHub にも: git push origin main
+```
+
+> - **基準DBは必ず単一の `python ingest.py --reset` で作る**（取り込みは中断後の再開も可能だが、複数回に分けるとカテゴリ体系が混ざるため）。
+> - 起動時の差分更新は「URL の追加・削除・1行説明の変化」までを自動追従します。`llms.txt` から検知できない**本文のみの変更**は、この再構築で反映します。
+> - `data/llm_cache.db`（回答キャッシュ）はコミット対象外です。
+
+---
+
 ## ライセンスと帰属
 
 - 本リポジトリの **MIT ライセンスは、独自の実装コード**（`app.py` などのソース）に適用されます。
