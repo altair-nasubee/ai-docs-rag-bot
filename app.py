@@ -6,6 +6,9 @@
 
 from __future__ import annotations
 
+import json
+import random
+
 import streamlit as st
 
 import config
@@ -115,8 +118,98 @@ def qa_view(engine: RagEngine, prompt: str | None) -> None:
         messages.append({"role": "assistant", "result": result})
 
 
+@st.cache_data(show_spinner=False)
+def load_quiz() -> list[dict]:
+    """事前生成したクイズ（data/quiz.json）を読み込む。"""
+    if config.QUIZ_PATH.exists():
+        data = json.loads(config.QUIZ_PATH.read_text(encoding="utf-8"))
+        return data.get("questions", [])
+    return []
+
+
+def _reset_quiz() -> None:
+    for k in ("quiz_questions", "quiz_idx", "quiz_score", "quiz_revealed", "quiz_choice"):
+        st.session_state.pop(k, None)
+
+
 def quiz_view() -> None:
-    st.info("理解度クイズはフェーズ2で実装予定です。")
+    questions = load_quiz()
+    if not questions:
+        st.info("クイズは未生成です。`python gen_quiz.py` を実行すると出題できます。")
+        return
+
+    # --- 開始前: カテゴリ・出題数の設定 ---
+    if "quiz_questions" not in st.session_state:
+        cats = sorted({q["category"] for q in questions})
+        choice = st.selectbox("分野", ["全分野"] + cats, index=0)
+        pool = questions if choice == "全分野" else [q for q in questions if q["category"] == choice]
+        st.caption(f"この分野の問題数: {len(pool)}")
+        max_n = len(pool)
+        num = st.slider("出題数", 1, max_n, min(5, max_n)) if max_n > 1 else max_n
+        if st.button("スタート", type="primary"):
+            st.session_state["quiz_questions"] = random.sample(pool, num)
+            st.session_state["quiz_idx"] = 0
+            st.session_state["quiz_score"] = 0
+            st.session_state["quiz_revealed"] = False
+            st.session_state["quiz_run"] = st.session_state.get("quiz_run", 0) + 1
+            st.rerun()
+        return
+
+    qs = st.session_state["quiz_questions"]
+    idx = st.session_state["quiz_idx"]
+    total = len(qs)
+
+    # --- 終了: 結果表示 ---
+    if idx >= total:
+        score = st.session_state["quiz_score"]
+        st.subheader(f"スコア: {score} / {total} 正解")
+        st.progress(score / total if total else 0.0)
+        if st.button("もう一度", type="primary"):
+            _reset_quiz()
+            st.rerun()
+        return
+
+    # --- 出題 ---
+    q = qs[idx]
+    st.progress(idx / total, text=f"{idx + 1} / {total} 問")
+    st.caption(f"分野: {q['category']}")
+    st.markdown(f"**Q{idx + 1}. {q['question']}**")
+
+    revealed = st.session_state["quiz_revealed"]
+    selected = st.radio(
+        "選択肢",
+        options=range(4),
+        format_func=lambda i: q["options"][i],
+        index=None,
+        key=f"quiz_radio_{st.session_state['quiz_run']}_{idx}",
+        disabled=revealed,
+        label_visibility="collapsed",
+    )
+
+    if not revealed:
+        if st.button("回答する", type="primary", disabled=selected is None):
+            st.session_state["quiz_choice"] = selected
+            if selected == q["answer"]:
+                st.session_state["quiz_score"] += 1
+            st.session_state["quiz_revealed"] = True
+            st.rerun()
+        return
+
+    # 採点結果＋解説（出題時に AI は呼ばない）。
+    chosen = st.session_state.get("quiz_choice")
+    if chosen == q["answer"]:
+        st.success("✓ 正解")
+    else:
+        st.error(f"✗ 不正解 — 正解: {q['options'][q['answer']]}")
+    if q.get("explanation"):
+        st.info(f"解説: {q['explanation']}")
+
+    last = idx == total - 1
+    if st.button("結果を見る" if last else "次の問題へ", type="primary"):
+        st.session_state["quiz_idx"] += 1
+        st.session_state["quiz_revealed"] = False
+        st.session_state.pop("quiz_choice", None)
+        st.rerun()
 
 
 # セグメント切替の選択肢（簡潔なラベル）。
@@ -126,7 +219,7 @@ VIEW_INFO = "ℹ️ 情報"
 
 
 def main() -> None:
-    st.title("💬 Claude Code ドキュメント Q&A")
+    st.header("💬 Claude Code Docs")
     engine, update_result = get_engine()
 
     # メイン上部のセグメント切替でビューを選ぶ（タブの代わり）。

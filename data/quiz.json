@@ -1,0 +1,582 @@
+{
+  "generated_at": "2026-06-24T06:26:55.864598+00:00",
+  "model": "llama-3.3-70b-versatile",
+  "questions": [
+    {
+      "category": "はじめに",
+      "question": "Claude Code のドキュメントのインデックスはどこで取得できるか",
+      "options": [
+        "https://code.claude.com/docs/index.txt",
+        "https://code.claude.com/docs/llms.txt",
+        "https://platform.claude.com/docs/en/about-claude/glossary",
+        "https://claude.ai/api/desktop/darwin/universal/dmg/latest/redirect"
+      ],
+      "answer": 1,
+      "explanation": "ドキュメントのインデックスは https://code.claude.com/docs/llms.txt で取得できる"
+    },
+    {
+      "category": "はじめに",
+      "question": "Agent SDK を使用して AI エージェントを構築するには、どのプログラミング言語が必要か",
+      "options": [
+        "Python 3.8+ と Node.js 16+",
+        "Python 3.10+ と Node.js 18+",
+        "Python 3.10+ と Java 11+",
+        "Python 3.8+ と Node.js 18+"
+      ],
+      "answer": 1,
+      "explanation": "Agent SDK を使用して AI エージェントを構築するには、Python 3.10+ または Node.js 18+ が必要"
+    },
+    {
+      "category": "はじめに",
+      "question": "Claude Code のデスクトップアプリは、どの OS で利用できるか",
+      "options": [
+        "macOS と Windows",
+        "macOS と Linux",
+        "Windows と Linux",
+        "macOS と Windows と Linux"
+      ],
+      "answer": 0,
+      "explanation": "Claude Code のデスクトップアプリは、macOS と Windows で利用できる"
+    },
+    {
+      "category": "はじめに",
+      "question": "Agentic Loop とは何か",
+      "options": [
+        "AI エージェントがコードを読み取るプロセス",
+        "AI エージェントがコードを変更するプロセス",
+        "AI エージェントがコンテキストを収集し、行動を取り、結果を検証するプロセス",
+        "AI エージェントがコードを実行するプロセス"
+      ],
+      "answer": 2,
+      "explanation": "Agentic Loop とは、AI エージェントがコンテキストを収集し、行動を取り、結果を検証するプロセス"
+    },
+    {
+      "category": "セットアップと管理",
+      "question": "Claude Code の設定はどのように配布されるか？",
+      "options": [
+        "Claude admin console からのみ",
+        "MDM システムからのみ",
+        "ファイルからのみ",
+        "Claude admin console、MDM システム、またはファイルから"
+      ],
+      "answer": 3,
+      "explanation": "Claude Code の設定は、Claude admin console、MDM システム、またはファイルから配布されることができる。"
+    },
+    {
+      "category": "セットアップと管理",
+      "question": "Claude Code のセッションの永続化はどのように行われるか？",
+      "options": [
+        "セッションの永続化は不要である",
+        "セッションの永続化は自動的に行われる",
+        "セッションの永続化は Agent SDK の設定によって行われる",
+        "セッションの永続化は Claude admin console から行われる"
+      ],
+      "answer": 2,
+      "explanation": "セッションの永続化は、Agent SDK の設定によって行われる。"
+    },
+    {
+      "category": "セットアップと管理",
+      "question": "Claude Code のドキュメント インデックスはどこから取得できるか？",
+      "options": [
+        "https://code.claude.com/docs/llms.pdf",
+        "https://code.claude.com/docs/llms.txt",
+        "https://claude.com/resources/tutorials/claude-enterprise-administrator-guide",
+        "https://support.claude.com/en/articles/11845131-use-claude-code-with-your-team-or-enterprise-plan"
+      ],
+      "answer": 1,
+      "explanation": "Claude Code のドキュメント インデックスは、https://code.claude.com/docs/llms.txt から取得できる。"
+    },
+    {
+      "category": "セットアップと管理",
+      "question": "Agent SDK のホスティング方法について説明しているページはどれか？",
+      "options": [
+        "Claude Code on Amazon Bedrock",
+        "Hosting the Agent SDK",
+        "Set up Claude Code for your organization",
+        "Claude Enterprise Administrator Guide"
+      ],
+      "answer": 1,
+      "explanation": "Agent SDK のホスティング方法について説明しているページは、Hosting the Agent SDK である。"
+    },
+    {
+      "category": "開発と統合",
+      "question": "アドバイザー・ツールを使用するには、Claude Code のどのバージョン以上が必要ですか。",
+      "options": [
+        "v2.0.0",
+        "v2.1.97",
+        "v2.1.98",
+        "v3.0.0"
+      ],
+      "answer": 2,
+      "explanation": "アドバイザー・ツールは実験的であり、Claude Code v2.1.98 以降が必要です。"
+    },
+    {
+      "category": "開発と統合",
+      "question": "アドバイザー・ツールはどのプラットフォームで利用できないですか。",
+      "options": [
+        "Anthropic",
+        "Amazon Bedrock",
+        "Google Vertex AI",
+        "Microsoft Azure"
+      ],
+      "answer": 1,
+      "explanation": "アドバイザー・ツールは Amazon Bedrock、Google Vertex AI、または Microsoft Foundry で利用できないと記載されています。"
+    },
+    {
+      "category": "開発と統合",
+      "question": "アドバイザーはどのように実行されますか。",
+      "options": [
+        "クライアントサイド",
+        "サーバーサイド",
+        "ローカル",
+        "クラウド"
+      ],
+      "answer": 1,
+      "explanation": "アドバイザーは Anthropic のインフラストラクチャ上でサーバーサイドとして実行されます。"
+    },
+    {
+      "category": "開発と統合",
+      "question": "エージェントSDKを使用するには、Claude Code CLIをインストールする必要がありますか。",
+      "options": [
+        "はい",
+        "いいえ",
+        "場合によっては",
+        "必須"
+      ],
+      "answer": 1,
+      "explanation": "エージェントSDKを使用するには、Claude Code CLIをインストールする必要はありません。"
+    },
+    {
+      "category": "セキュリティとコンプライアンス",
+      "question": "Claude Agent SDK では、ツールの使用を管理するためにどのような機能が提供されていますか？",
+      "options": [
+        "パーミッション モードとルールのみ",
+        "hooks と declarative allow/deny ルールのみ",
+        "パーミッション モード、hooks、declarative allow/deny ルール",
+        "パーミッション モードと hooks のみ"
+      ],
+      "answer": 2,
+      "explanation": "Claude Agent SDK では、パーミッション モード、hooks、declarative allow/deny ルールを使用して、ツールの使用を管理できます。"
+    },
+    {
+      "category": "セキュリティとコンプライアンス",
+      "question": "Claude がツールを要求したときに、SDK はパーミッションをどのような順序で評価しますか？",
+      "options": [
+        "deny ルール、hooks、パーミッション モード",
+        "hooks、deny ルール、パーミッション モード",
+        "パーミッション モード、hooks、deny ルール",
+        "hooks、パーミッション モード、deny ルール"
+      ],
+      "answer": 1,
+      "explanation": "SDK は、hooks を最初に実行し、次に deny ルールとパーミッション モードを評価します。"
+    },
+    {
+      "category": "セキュリティとコンプライアンス",
+      "question": "Claude Code と Agent SDK をデプロイする際に考慮すべき重要な点は何ですか？",
+      "options": [
+        "セキュリティとコンプライアンスのみ",
+        "パフォーマンスとスケーラビリティのみ",
+        "セキュリティ、コンプライアンス、パフォーマンス、スケーラビリティ",
+        "コストとユーザビリティのみ"
+      ],
+      "answer": 2,
+      "explanation": "Claude Code と Agent SDK をデプロイする際には、セキュリティ、コンプライアンス、パフォーマンス、スケーラビリティなど、多くの点を考慮する必要があります。"
+    },
+    {
+      "category": "セキュリティとコンプライアンス",
+      "question": "Claude Code では、どのような認証方法がサポートされていますか？",
+      "options": [
+        "Claude.ai アカウントのみ",
+        "Claude for Teams または Enterprise のみ",
+        "クラウド プロバイダーのみ",
+        "複数の認証方法"
+      ],
+      "answer": 3,
+      "explanation": "Claude Code では、Claude.ai アカウント、Claude for Teams または Enterprise、クラウド プロバイダーなど、複数の認証方法がサポートされています。"
+    },
+    {
+      "category": "プラグインと拡張",
+      "question": "Claude Codeを拡張するために使用できるものは何ですか？",
+      "options": [
+        "プラグイン",
+        "マーケットプレイス",
+        "IDE",
+        "キーボードショートカット"
+      ],
+      "answer": 0,
+      "explanation": "プラグインは、Claude Codeをスキル、エージェント、フック、MCPサーバーで拡張するために使用できます。"
+    },
+    {
+      "category": "プラグインと拡張",
+      "question": "プラグインの種類にはどのようなものがありますか？",
+      "options": [
+        "スキル",
+        "エージェント",
+        "フック",
+        "すべて"
+      ],
+      "answer": 3,
+      "explanation": "プラグインには、スキル、エージェント、フック、MCPサーバーが含まれます。"
+    },
+    {
+      "category": "プラグインと拡張",
+      "question": "マーケットプレイスを使用する際の手順は何ですか？",
+      "options": [
+        "マーケットプレイスを追加してからプラグインをインストールする",
+        "プラグインをインストールしてからマーケットプレイスを追加する",
+        "マーケットプレイスを追加するだけ",
+        "プラグインをインストールするだけ"
+      ],
+      "answer": 0,
+      "explanation": "マーケットプレイスを使用する際は、まずマーケットプレイスを追加してから、必要なプラグインをインストールします。"
+    },
+    {
+      "category": "プラグインと拡張",
+      "question": "JetBrains IDEsとの統合で使用できる機能にはどのようなものがありますか？",
+      "options": [
+        "クイックランチ",
+        "ディフビューイング",
+        "セレクションコンテキスト",
+        "すべて"
+      ],
+      "answer": 3,
+      "explanation": "JetBrains IDEsとの統合では、クイックランチ、ディフビューイング、セレクションコンテキスト、ファイルリファレンスショートカット、診断共有などの機能が使用できます。"
+    },
+    {
+      "category": "トラブルシューティング",
+      "question": "Claude Code の設定が反映されない場合、どのようなことが原因である可能性があるか？",
+      "options": [
+        "ファイルが読み込まれたが、内容が空である",
+        "ファイルが読み込まれたが、内容が正しくない",
+        "ファイルが読み込まれない、または読み込まれた場所が予想と異なる、または他のファイルによって上書きされる",
+        "ファイルの名前が間違っている"
+      ],
+      "answer": 2,
+      "explanation": "Claude Code の設定が反映されない場合、ファイルが読み込まれない、または読み込まれた場所が予想と異なる、または他のファイルによって上書きされることが原因である可能性がある。"
+    },
+    {
+      "category": "トラブルシューティング",
+      "question": "Claude Code のコンテキストウィンドウに占有されているものを確認するコマンドは何か？",
+      "options": [
+        "/context",
+        "/doctor",
+        "/hooks",
+        "/mcp"
+      ],
+      "answer": 0,
+      "explanation": "/context コマンドを使用すると、現在のセッションのコンテキストウィンドウに占有されているものを確認することができる。"
+    },
+    {
+      "category": "トラブルシューティング",
+      "question": "Claude Code のランタイムエラーの詳細を確認するために、どのようなページを参照する必要があるか？",
+      "options": [
+        "トラブルシューティングのページ",
+        "インストールとログインのトラブルシューティングページ",
+        "エラーリファレンスページ",
+        "Claude Platform のエラーリファレンスページ"
+      ],
+      "answer": 2,
+      "explanation": "Claude Code のランタイムエラーの詳細を確認するために、エラーリファレンスページを参照する必要がある。"
+    },
+    {
+      "category": "トラブルシューティング",
+      "question": "Claude Code のエラーリファレンスページでは、どのような情報が提供されているか？",
+      "options": [
+        "インストールエラーの解決方法",
+        "ランタイムエラーの解決方法",
+        "Claude API のエラー解決方法",
+        "Claude Code の設定方法"
+      ],
+      "answer": 1,
+      "explanation": "Claude Code のエラーリファレンスページでは、ランタイムエラーの解決方法が提供されている。"
+    },
+    {
+      "category": "APIとSDK",
+      "question": "Claude Code のドキュメントインデックスはどこで取得できるか",
+      "options": [
+        "https://code.claude.com/docs/llms.pdf",
+        "https://code.claude.com/docs/llms.txt",
+        "https://code.claude.com/docs/index.html",
+        "https://code.claude.com/docs/api.txt"
+      ],
+      "answer": 1,
+      "explanation": "ドキュメントインデックスは https://code.claude.com/docs/llms.txt で取得できる"
+    },
+    {
+      "category": "APIとSDK",
+      "question": "Python Agent SDK をインストールするために使用するコマンドは何か",
+      "options": [
+        "pip install claude-sdk",
+        "pip install claude-agent",
+        "pip install claude-agent-sdk",
+        "pip install python-claude"
+      ],
+      "answer": 2,
+      "explanation": "Python Agent SDK をインストールするには pip install claude-agent-sdk コマンドを使用する"
+    },
+    {
+      "category": "APIとSDK",
+      "question": "Python SDK では Claude Code とやり取りする方法は何通りあるか",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "answer": 1,
+      "explanation": "Python SDK では Claude Code とやり取りする方法は 2 つある"
+    },
+    {
+      "category": "APIとSDK",
+      "question": "Python Agent SDK の API リファレンスはどこに記載されているか",
+      "options": [
+        "Agent SDK reference - Java",
+        "Agent SDK reference - Python",
+        "Agent SDK reference - C++",
+        "Agent SDK reference - Ruby"
+      ],
+      "answer": 1,
+      "explanation": "Python Agent SDK の API リファレンスは Agent SDK reference - Python に記載されている"
+    },
+    {
+      "category": "セッションとワークフロー",
+      "question": "セッションストアを使用する一般的な理由は何ですか？",
+      "options": [
+        "マルチホストデプロイのみ",
+        "耐久性とコンプライアンスのみ",
+        "マルチホストデプロイ、耐久性、コンプライアンス",
+        "セキュリティのみ"
+      ],
+      "answer": 2,
+      "explanation": "セッションストアは、マルチホストデプロイ、耐久性、コンプライアンスのために使用されます。"
+    },
+    {
+      "category": "セッションとワークフロー",
+      "question": "セッションストアのインターフェイスにはどのようなメソッドが必要ですか？",
+      "options": [
+        "appendとloadのみ",
+        "appendとload、そして3つのオプショナルメソッド",
+        "loadのみ",
+        "appendのみ"
+      ],
+      "answer": 1,
+      "explanation": "セッションストアのインターフェイスには、appendとloadの2つの必須メソッドと、3つのオプショナルメソッドが必要です。"
+    },
+    {
+      "category": "セッションとワークフロー",
+      "question": "セッションとは何ですか？",
+      "options": [
+        "エージェントの会話履歴",
+        "エージェントのファイルシステム",
+        "エージェントのツール",
+        "エージェントのプロンプト"
+      ],
+      "answer": 0,
+      "explanation": "セッションとは、エージェントの会話履歴です。"
+    },
+    {
+      "category": "セッションとワークフロー",
+      "question": "チャネルを使用する主な目的は何ですか？",
+      "options": [
+        "セッションを保存する",
+        "セッションを読み込む",
+        "イベントをプッシュする",
+        "セッションを終了する"
+      ],
+      "answer": 2,
+      "explanation": "チャネルを使用する主な目的は、イベントをプッシュすることです。"
+    },
+    {
+      "category": "コラボレーションとチームワーク",
+      "question": "Todoのライフサイクルはどのように進むか",
+      "options": [
+        "作成→完了→削除",
+        "作成→開始→完了→削除",
+        "作成→完了",
+        "作成→開始→完了"
+      ],
+      "answer": 1,
+      "explanation": "Todoのライフサイクルは、作成（pending）→開始（in_progress）→完了→削除の4つのステージで進む。"
+    },
+    {
+      "category": "コラボレーションとチームワーク",
+      "question": "Agentチームを有効にするにはどうすればよいか",
+      "options": [
+        "settings.jsonにCLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMSを追加する",
+        "settings.jsonにCLAUDE_CODE_AGENT_TEAMSを追加する",
+        "環境変数にCLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMSを追加する",
+        "環境変数にCLAUDE_CODE_AGENT_TEAMSを追加する"
+      ],
+      "answer": 0,
+      "explanation": "Agentチームを有効にするには、settings.jsonまたは環境変数にCLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMSを追加する必要がある。"
+    },
+    {
+      "category": "コラボレーションとチームワーク",
+      "question": "Agentビューの機能は何か",
+      "options": [
+        "複数のセッションを一括管理する",
+        "セッションを新規作成する",
+        "セッションを終了する",
+        "セッションを編集する"
+      ],
+      "answer": 0,
+      "explanation": "Agentビューは、複数のClaude Codeセッションを一括管理する機能で、セッションの状態を一目で確認し、必要に応じて介入できる。"
+    },
+    {
+      "category": "コラボレーションとチームワーク",
+      "question": "Todoの自動作成はどのような場合に発生するか",
+      "options": [
+        "タスクが完了した場合",
+        "タスクが開始された場合",
+        "タスクが識別された場合",
+        "タスクが削除された場合"
+      ],
+      "answer": 2,
+      "explanation": "SDKは、タスクが識別された場合に自動的にTodoを作成する。"
+    },
+    {
+      "category": "リソースとサポート",
+      "question": "Claude Code のドキュメントの完全なインデックスはどこで取得できるか",
+      "options": [
+        "https://code.claude.com/docs/llms.txt",
+        "https://code.claude.com/docs/index.txt",
+        "https://code.claude.com/docs/api.txt",
+        "https://code.claude.com/docs/dashboard.txt"
+      ],
+      "answer": 0,
+      "explanation": "ドキュメントの完全なインデックスは、https://code.claude.com/docs/llms.txt で取得できる。"
+    },
+    {
+      "category": "リソースとサポート",
+      "question": "Claude Code ではどのようなダッシュボードが提供されているか",
+      "options": [
+        "プロジェクト管理ダッシュボード",
+        "開発者コミュニティダッシュボード",
+        "アナリティクスダッシュボード",
+        "セキュリティダッシュボード"
+      ],
+      "answer": 2,
+      "explanation": "Claude Code では、アナリティクスダッシュボードが提供されている。"
+    },
+    {
+      "category": "リソースとサポート",
+      "question": "アナリティクスダッシュボードで何ができるか",
+      "options": [
+        "開発者への通知の設定",
+        "プロジェクトのバックアップの作成",
+        "開発者使用状況のメトリクスの表示",
+        "開発者のスキルレベルの評価"
+      ],
+      "answer": 2,
+      "explanation": "アナリティクスダッシュボードでは、開発者使用状況のメトリクスを表示できる。"
+    },
+    {
+      "category": "リソースとサポート",
+      "question": "アナリティクスダッシュボードの目的は何か",
+      "options": [
+        "開発者のスキルレベルの向上",
+        "開発者使用状況のメトリクスの表示",
+        "組織の開発プロセスの最適化",
+        "開発者のコミュニティへの参加"
+      ],
+      "answer": 2,
+      "explanation": "アナリティクスダッシュボードの目的は、組織の開発プロセスの最適化である。"
+    },
+    {
+      "category": "リリースノートとアップデート",
+      "question": "Claude Code の完全なドキュメントインデックスを取得するための URL は何ですか？",
+      "options": [
+        "https://code.claude.com/docs/llms.txt",
+        "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md",
+        "https://code.claude.com/docs/index.html",
+        "https://claude.com/docs/llms.txt"
+      ],
+      "answer": 0,
+      "explanation": "ドキュメントインデックスは、指定された URL から取得できます。"
+    },
+    {
+      "category": "リリースノートとアップデート",
+      "question": "Claude Code のリリースノートはどこから生成されていますか？",
+      "options": [
+        "GitHub の CHANGELOG.md",
+        "Claude Code の公式ウェブサイト",
+        "Claude Code のドキュメントインデックス",
+        "Claude Code の GitHub リポジトリ"
+      ],
+      "answer": 0,
+      "explanation": "リリースノートは GitHub の CHANGELOG.md から生成されています。"
+    },
+    {
+      "category": "リリースノートとアップデート",
+      "question": "インストールされている Claude Code のバージョンを確認するコマンドは何ですか？",
+      "options": [
+        "claude --version",
+        "claude -v",
+        "claude version",
+        "claude info"
+      ],
+      "answer": 0,
+      "explanation": "インストールされているバージョンを確認するには、claude --version コマンドを実行します。"
+    },
+    {
+      "category": "リリースノートとアップデート",
+      "question": "Claude Code のドキュメントインデックスの目的は何ですか？",
+      "options": [
+        "すべての利用可能なページを発見する",
+        "Claude Code の使用方法を学ぶ",
+        "リリースノートを確認する",
+        "バグを報告する"
+      ],
+      "answer": 0,
+      "explanation": "ドキュメントインデックスは、すべての利用可能なページを発見するために使用されます。"
+    },
+    {
+      "category": "ベストプラクティス",
+      "question": "Claude Codeはどのような環境ですか？",
+      "options": [
+        "チャットボット環境",
+        "アジェンティックコーディング環境",
+        "レビューエンジン",
+        "テスト自動化環境"
+      ],
+      "answer": 1,
+      "explanation": "Claude Codeはアジェンティックコーディング環境であり、ファイルの読み取り、コマンドの実行、変更の作成、問題の解決を自律的に行うことができます。"
+    },
+    {
+      "category": "ベストプラクティス",
+      "question": "Claude Codeを使用する際の主な作業方法は何ですか？",
+      "options": [
+        "コードを自分で書き、Claudeにレビューを依頼する",
+        "Claudeにコードを書いてもらう",
+        "Claudeに何が必要かを説明し、Claudeが実装する",
+        "コードを書き、Claudeにテストを依頼する"
+      ],
+      "answer": 2,
+      "explanation": "Claude Codeを使用する際の主な作業方法は、必要なものを説明し、Claudeが実装することです。"
+    },
+    {
+      "category": "ベストプラクティス",
+      "question": "Claude Codeのパフォーマンスに影響を与える主な要因は何ですか？",
+      "options": [
+        "コードの複雑さ",
+        "コンテキストウィンドウのサイズ",
+        "ハードウェアの性能",
+        "ネットワークの速度"
+      ],
+      "answer": 1,
+      "explanation": "Claude Codeのパフォーマンスに影響を与える主な要因は、コンテキストウィンドウのサイズです。コンテキストウィンドウが満たされると、パフォーマンスが低下します。"
+    },
+    {
+      "category": "ベストプラクティス",
+      "question": "Claude Codeのベストプラクティスに関する情報はどこで見つけることができますか？",
+      "options": [
+        "Claude Codeの公式ウェブサイト",
+        "Claude Codeのドキュメントインデックス",
+        "Claude CodeのGitHubリポジトリ",
+        "Claude Codeのフォーラム"
+      ],
+      "answer": 1,
+      "explanation": "Claude Codeのベストプラクティスに関する情報は、ドキュメントインデックスで見つけることができます。"
+    }
+  ]
+}
