@@ -50,9 +50,8 @@ def _render_category_help(engine: RagEngine) -> None:
 def info_view(engine: RagEngine, update_result: dict) -> None:
     """補助情報（説明・ステータス・会話クリア）を表示するビュー。"""
     st.write(
-        "Claude Code について日本語で質問すると、Claude Code 公式ドキュメントをRAGで検索して日本語で回答します。"
-        "アプリ内部では、GroqのAIモデルを無料枠で使ってチャットの回答を作成しています。"
-        "カテゴリは選ばなくても全分野から検索します。"
+        "Claude Code 公式ドキュメントをAIが検索し、チャットで質問とクイズができるアプリです。"
+        "AIは無料でも使えるGroqを使用して、無料で運用しています。"
     )
     manifest = load_manifest() or {}
     st.caption(f"使用モデル: {config.GROQ_MODEL}")
