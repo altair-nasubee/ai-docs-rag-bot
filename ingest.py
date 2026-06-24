@@ -18,7 +18,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import math
 import re
 import shutil
 from dataclasses import dataclass
@@ -127,6 +126,15 @@ def _extract_json(text: str) -> dict:
     return json.loads(raw[start : end + 1])
 
 
+# 受け皿（catch-all）とみなすカテゴリ名（部分一致・小文字で判定）。
+_CATCHALL_NAMES = ("その他", "ミスセル", "雑多", "other", "misc", "miscellaneous", "etc")
+
+
+def _is_catchall(name: str) -> bool:
+    low = name.strip().lower()
+    return any(k in low for k in _CATCHALL_NAMES)
+
+
 def generate_taxonomy(pages: List[Page]) -> List[dict]:
     """全ページのタイトル＋説明からカテゴリ体系を生成する（LLM 1回）。
 
@@ -139,6 +147,9 @@ def generate_taxonomy(pages: List[Page]) -> List[dict]:
         "以下は Claude Code 公式ドキュメントのページ一覧（英語タイトルと説明）です。\n"
         "これらを、初学者にも分かりやすい日本語のカテゴリへ分類する『カテゴリ体系』を作ってください。\n"
         f"カテゴリ数は内容に応じて {n_hint} 個程度にまとめること。\n"
+        "重要: 「その他」「ミスセル」「Other」「Miscellaneous」のような漠然とした"
+        "受け皿（catch-all）カテゴリは作らないこと。すべてのカテゴリは具体的で意味のある"
+        "テーマにし、どのページも必ずいずれかの具体的なカテゴリに収まるようにすること。\n"
         "各カテゴリには、日本語のカテゴリ名・一文の説明・そのカテゴリで尋ねそうな日本語の質問例を2つ付けること。\n\n"
         "出力は次の JSON のみ（前後に説明文を付けない）:\n"
         '{"categories": [{"name": "日本語カテゴリ名", "description": "一文の説明", '
@@ -148,6 +159,8 @@ def generate_taxonomy(pages: List[Page]) -> List[dict]:
     resp = _chat_model().invoke(prompt)
     data = _extract_json(resp.content if hasattr(resp, "content") else str(resp))
     categories = data.get("categories", [])
+    # 保険: 指示に反して catch-all（その他/Other 等）が生成されても除外する。
+    categories = [c for c in categories if not _is_catchall(c.get("name", ""))]
     if not categories:
         raise ValueError("カテゴリ体系を生成できませんでした。")
     # examples が無い場合に備えて整形。

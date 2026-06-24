@@ -1,0 +1,7 @@
+# アプリのテーマ設定。
+# primaryColor はチャット入力の送信アイコンや各種アクセントに使われる。
+# 既定の赤(#FF4B4B)から、目に優しい水色に変更。
+# base="dark" でダークモードを維持する（[theme] を定義すると既定が light になるため）。
+[theme]
+base = "dark"
+primaryColor = "#62B6CB"

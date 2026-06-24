@@ -44,24 +44,20 @@ def _render_category_help(engine: RagEngine) -> None:
                     st.rerun()
 
 
-def _render_sidebar(engine: RagEngine, update_result: dict) -> None:
-    with st.sidebar:
-        st.header("このアプリについて")
-        st.write(
-            "Claude Code 公式ドキュメントを根拠に、日本語で質問へ回答します。"
-            "カテゴリは選ばなくても全分野から検索します。"
-        )
-        st.divider()
-        st.subheader("ステータス")
-        manifest = load_manifest() or {}
-        st.caption(f"使用モデル: {config.GROQ_MODEL}")
-        st.caption(f"埋め込み: {config.EMBED_MODEL}")
-        st.caption(f"基準DB構築: {manifest.get('built_at', '不明')}")
-        st.caption(f"差分更新: {update_result.get('status', '不明')}")
-        st.divider()
-        if st.button("会話をクリア"):
-            st.session_state["messages"] = []
-            st.rerun()
+def info_view(engine: RagEngine, update_result: dict) -> None:
+    """補助情報（説明・ステータス・会話クリア）を表示するビュー。"""
+    st.write(
+        "Claude Code 公式ドキュメントを根拠に、日本語で質問へ回答します。"
+        "カテゴリは選ばなくても全分野から検索します。"
+    )
+    manifest = load_manifest() or {}
+    st.caption(f"使用モデル: {config.GROQ_MODEL}")
+    st.caption(f"埋め込み: {config.EMBED_MODEL}")
+    st.caption(f"基準DB構築: {manifest.get('built_at', '不明')}")
+    st.caption(f"差分更新: {update_result.get('status', '不明')}")
+    if st.button("会話をクリア"):
+        st.session_state["messages"] = []
+        st.rerun()
 
 
 def _render_answer(result: dict) -> None:
@@ -77,7 +73,7 @@ def _render_answer(result: dict) -> None:
                 st.markdown(f"- [{s['title']}]({s['url']})")
 
 
-def qa_tab(engine: RagEngine) -> None:
+def qa_view(engine: RagEngine, prompt: str | None) -> None:
     category = _category_selectbox(engine)
     _render_category_help(engine)
     st.divider()
@@ -94,9 +90,8 @@ def qa_tab(engine: RagEngine) -> None:
             else:
                 st.markdown(msg["content"])
 
-    # 質問例ボタンから投入された質問を拾う。
-    pending = st.session_state.pop("pending_question", None)
-    question = st.chat_input("ここに質問を入力") or pending
+    # 画面下部に固定したチャット入力（main で取得）と、質問例ボタンからの投入を拾う。
+    question = prompt or st.session_state.pop("pending_question", None)
 
     if question:
         messages.append({"role": "user", "content": question})
@@ -120,20 +115,40 @@ def qa_tab(engine: RagEngine) -> None:
         messages.append({"role": "assistant", "result": result})
 
 
-def quiz_tab() -> None:
+def quiz_view() -> None:
     st.info("理解度クイズはフェーズ2で実装予定です。")
+
+
+# セグメント切替の選択肢（簡潔なラベル）。
+VIEW_QA = "💬 Q&A"
+VIEW_QUIZ = "📝 クイズ"
+VIEW_INFO = "ℹ️ 情報"
 
 
 def main() -> None:
     st.title("💬 Claude Code ドキュメント Q&A")
     engine, update_result = get_engine()
-    _render_sidebar(engine, update_result)
 
-    qa, quiz = st.tabs(["💬 Q&A", "📝 クイズ"])
-    with qa:
-        qa_tab(engine)
-    with quiz:
-        quiz_tab()
+    # メイン上部のセグメント切替でビューを選ぶ（タブの代わり）。
+    view = (
+        st.segmented_control(
+            "表示切替",
+            options=[VIEW_QA, VIEW_QUIZ, VIEW_INFO],
+            default=VIEW_QA,
+            label_visibility="collapsed",
+        )
+        or VIEW_QA  # 選択解除時は Q&A に戻す。
+    )
+    st.divider()
+
+    if view == VIEW_QA:
+        # st.chat_input はタブ/カラム等の外（トップレベル）で呼ぶと画面下部に固定される。
+        prompt = st.chat_input("ここに質問を入力")
+        qa_view(engine, prompt)
+    elif view == VIEW_QUIZ:
+        quiz_view()
+    else:
+        info_view(engine, update_result)
 
 
 if __name__ == "__main__":

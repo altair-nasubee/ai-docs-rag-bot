@@ -38,19 +38,29 @@ def _l2_normalize(vector: List[float]) -> List[float]:
 
 
 def _ensure_registered(model_name: str) -> None:
-    """カスタム登録が要るモデル（e5-small）を一度だけ fastembed に登録する。"""
+    """カスタム登録が要るモデル（e5-small）を fastembed に登録する。
+
+    fastembed の登録簿はプロセス全体のグローバルで、Streamlit の再実行などで
+    本モジュールの `_registered` だけがリセットされると二重登録になり得る。
+    その場合 fastembed は ValueError(already registered) を投げるため、握りつぶす。
+    """
     if model_name != _E5_SMALL or model_name in _registered:
         return
     from fastembed.common.model_description import ModelSource, PoolingType
 
-    TextEmbedding.add_custom_model(
-        model=_E5_SMALL,
-        pooling=PoolingType.MEAN,
-        normalization=True,
-        sources=ModelSource(hf=_E5_SMALL),
-        dim=config.EMBED_DIM,
-        model_file="onnx/model.onnx",
-    )
+    try:
+        TextEmbedding.add_custom_model(
+            model=_E5_SMALL,
+            pooling=PoolingType.MEAN,
+            normalization=True,
+            sources=ModelSource(hf=_E5_SMALL),
+            dim=config.EMBED_DIM,
+            model_file="onnx/model.onnx",
+        )
+    except ValueError as exc:
+        # 既に登録済み（同一プロセスで別経路から登録された等）は正常扱い。
+        if "already registered" not in str(exc):
+            raise
     _registered.add(model_name)
 
 
