@@ -1,0 +1,6 @@
+{
+    // この設定は、VS Code の Python 拡張機能が使用するデフォルトの Python インタプリタのパスを指定しています。
+    // "${workspaceFolder}/.venv/bin/python" は、ワークスペース直下にある .venv 仮想環境内の python 実行ファイルを意味します。
+    // これにより、VS Code で仮想環境の Python が自動的に使われます。
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python"
+}
