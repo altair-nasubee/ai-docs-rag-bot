@@ -95,4 +95,11 @@ LLM の学習時点の古い・deprecated な API ではなく、最新ドキュ
 ## テスト / 検証
 
 - 現状、自動テスト（`tests/` 等）は無し。
-- 変更後の動作確認は、アプリを起動して実際に「質問→回答→出典表示」「クイズ」が動くかをブラウザで確認する（`docs/PLAYWRIGHT.md` の手順が使える）。
+- 変更後の動作確認は、アプリを起動して実際に「質問→回答→出典表示」「クイズ」が動くかをブラウザで確認する。**Playwright MCP**（`docs/PLAYWRIGHT.md`）で自動操作・スクショ撮影ができる。
+
+### Playwright MCP を使うときの注意（開発時の動作確認用）
+
+- **MCP は user スコープで登録済み**（`@playwright/mcp@latest --browser chromium`）。アプリ本体には組み込まない開発支援ツール。詳細・再セットアップは `docs/PLAYWRIGHT.md`。
+- **必ず先にアプリを起動しておく。** Playwright で開く前に別ターミナルで `.venv/bin/streamlit run app.py` を立ち上げ、`http://localhost:8501` を対象にする（未起動だと接続エラー）。
+- **WSL 環境はヘッドレス前提。** `--browser chromium` 指定が必須（外すと Chrome 本体を探して `Chromium distribution 'chrome' is not found` で失敗する）。ブラウザ依存が足りないときは `npx playwright install-deps`。
+- MCP 設定の変更は稼働中の Claude Code には反映されないため、登録し直したら**再起動**する。
