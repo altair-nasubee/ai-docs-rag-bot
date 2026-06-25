@@ -226,3 +226,7 @@ __marimo__/
 # RAG ランタイムキャッシュ（基準DBの data/chroma と manifest.json は同梱・コミットする）
 data/llm_cache.db
 
+# Playwright MCP（動作確認ツールの出力。スナップショット .yml やスクショが入る既定の出力先）
+#   Context7 はファイルを生成しないため記載不要（APIキーは MCP 設定側に保存される）
+.playwright-mcp/
+
