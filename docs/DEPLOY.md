@@ -156,8 +156,8 @@ git add data/                # chroma は LFS で更新される
 git commit -m "rebuild base DB"
 git push space main
 ```
-
-（任意）GitHub Actions で `ingest.py` を定期実行して `data/` を再コミットすれば自動化できます。
+- `git push space main` では認証が必要。**Username = `<HF_USER>` / Password = `<HF_TOKEN>`** をコピペする。
+- （任意）GitHub Actions で `ingest.py` を定期実行して `data/` を再コミットすれば自動化できます。
 
 ---
 
