@@ -324,7 +324,7 @@ AI に毎回マニュアル全文を読ませると遅く・高コストにな�
 - [x] **リポジトリを Space に push**（`data/` を同梱）。`data/chroma` は **Git LFS**（HF は 10MB 超を LFS 必須・ネイティブ対応）、`manifest.json` / `quiz.json` は通常 git。`data/llm_cache.db` は除外。
 - [x] Space の **Settings → Secrets に `GROQ_API_KEY` のみ**登録（環境変数として渡る＝`config.py` の `os.getenv` で動く。埋め込みはローカルのためキー不要）。
 - [x] **初回起動でモデル(e5-small ~930MB＋onnxruntime)がダウンロード/ロード**されることを確認（16GB 内・コールドスタートに数十秒）。
-- [ ] スリープ（48h）復帰時に起動時差分更新が走り、最新ドキュメントで回答できることを確認。差分の再Embeddingはローカルで無料。
+- [x] スリープ（48h）復帰時に起動時差分更新が走り、最新ドキュメントで回答できることを確認。差分の再Embeddingはローカルで無料。
 - [x] iPhone の実機ブラウザで表示・操作（下部固定入力・クイズ・出典リンク）を確認。
 - [ ] （任意）`data/` の鮮度維持のため GitHub Actions 等で `ingest.py` を定期実行し再コミット。
 
