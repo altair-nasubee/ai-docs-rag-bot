@@ -43,7 +43,22 @@ def _get(key: str, default: str | None = None) -> str | None:
 GROQ_API_KEY: str | None = _get("GROQ_API_KEY")
 
 # ===== モデル設定 =====
-GROQ_MODEL: str = _get("GROQ_MODEL", "llama-3.3-70b-versatile")
+# 既定は Groq がホストするオープンウェイトモデル。旧既定の
+# llama-3.3-70b-versatile は Groq が 2026-08-16 に無料/開発者ティア向けを終了し、
+# 404 (model_not_found) を返すため、公式が推奨する移行先へ変更した。
+GROQ_MODEL: str = _get("GROQ_MODEL", "openai/gpt-oss-120b")
+# gpt-oss 系は「推論（reasoning）モデル」で、最終回答の前に内部思考（reasoning）へ
+# 出力トークンを消費する。小さすぎると思考で使い切って JSON が途中で切れ、大きすぎると
+# gpt-oss-120b の無料枠 TPM(8000) に対し「prompt + max_tokens」が超過して 413
+# （Request too large）になる。取り込み最大プロンプトのカテゴリ体系生成は
+# ingest 側で説明文を短縮して prompt≒4074 トークンに圧縮済み（出力実測≒1459・
+# 推論量のブレで前後する）。3072 なら 4074+3072=7146<8000 で 413 を避けつつ出力も
+# 完結する。※ ドキュメント数が大幅に増えたら ingest 側の _DESC_LIMIT も見直す。
+GROQ_MAX_TOKENS: int = int(_get("GROQ_MAX_TOKENS", "3072"))
+# 推論の強さ。カテゴリ分類・クイズ生成のような定型 JSON 生成や RAG 回答では
+# 最小限で十分（速く・トークン節約）。gpt-oss 系は low/medium/high、
+# Qwen 系は none/default のみ対応。非対応モデルへ切替える場合はこの値を合わせる。
+GROQ_REASONING_EFFORT: str = _get("GROQ_REASONING_EFFORT", "low")
 # 埋め込みはローカル ONNX（fastembed）。多言語・クロスリンガル対応の小型モデル。
 EMBED_MODEL: str = _get("EMBED_MODEL", "intfloat/multilingual-e5-small")
 EMBED_DIM: int = int(_get("EMBED_DIM", "384"))

@@ -40,7 +40,7 @@ LLM の学習時点の古い・deprecated な API ではなく、最新ドキュ
 
 - **言語 / ランタイム**: Python 3.11
 - **UI**: Streamlit（`:8501`）
-- **LLM（回答生成）**: Groq（既定 `llama-3.3-70b-versatile`）。`GROQ_API_KEY` が必要。
+- **LLM（回答生成）**: Groq（既定 `openai/gpt-oss-120b`。Groq ホストのオープンウェイトモデルで `GROQ_API_KEY` のみで利用可・OpenAI キー不要）。`GROQ_API_KEY` が必要。旧既定 `llama-3.3-70b-versatile` は Groq が 2026-08-16 に無料/開発者ティア向けを終了し 404 になるため使用不可。
 - **埋め込み**: ローカル ONNX（fastembed / `intfloat/multilingual-e5-small`、384次元）。**API キー不要**。
 - **ベクトルDB**: Chroma（`data/chroma` に永続化、コレクション名 `claude_code_docs`）
 - **連携**: LangChain（`langchain` / `langchain-groq` / `langchain-chroma` / `langchain-text-splitters`）
@@ -86,6 +86,9 @@ LLM の学習時点の古い・deprecated な API ではなく、最新ドキュ
 - **`CHUNK_SIZE`（既定1500文字）はモデルの最大系列長に依存。** e5-small は最大512トークン（1500文字 ≒ ~375トークンで上限内）。MiniLM（最大128トークン）に替えるなら ~400文字まで縮める。
 - **AI 呼び出しは最小化する設計。** クイズは事前生成（出題時は JSON を読むだけ）、差分更新の新規ページ分類も LLM ではなくカテゴリ代表ベクトルとの類似度で行う。質問時は埋め込みを1回だけ計算し、検索と分野推定の両方に使い回す。
 - **無料枠が大前提。** Groq のレート制限（6,000 TPM）内に収める。`RETRIEVAL_K=8`。
+- **既定の `openai/gpt-oss-120b` は「推論（reasoning）モデル」。** 最終回答の前に思考トークンを消費するため、Groq 既定の出力上限（`max_completion_tokens=1024`）だと JSON が途中で切れて `_extract_json` がパース失敗する（`finish_reason=length`）。`GROQ_REASONING_EFFORT`（既定 `low`）で思考を最小限に抑える。これは 404 とは別問題で、レート制限（429）でもない。非推論モデルへ切替える場合は `GROQ_REASONING_EFFORT` を合わせる（Qwen 系は `none`/`default`）。
+- **`GROQ_MAX_TOKENS` は「大きすぎ」も NG。** gpt-oss-120b の無料枠 **TPM は 8000**、Groq は「`prompt + max_tokens`」で1リクエストを見積るため、上限が大きいと **413（Request too large）** で即失敗する。取り込みで最大のプロンプトは全ページ一覧を渡すカテゴリ体系生成。**そのままだと `prompt≒6817`→`+max_tokens` で 413**。そこで `ingest.py` の `_page_listing`（`_DESC_LIMIT=60`）で説明文を短縮し **`prompt≒4074` に圧縮**、`GROQ_MAX_TOKENS=3072`（`4074+3072=7146<8000`）で **413回避と出力完結（実測 completion≒1459）を両立**。ドキュメント数が大幅に増えたら `_DESC_LIMIT` を見直す。
+- **`generate_taxonomy` / `assign_categories` は 429 リトライ付き（ただし枠は無駄にしない）。** `_invoke_with_retry` はレート制限(429)のみ再試行し、待機は Groq の `Retry-After` を優先（最大4回）。**429 で拒否された呼び出しはトークンを消費しない**ため、再試行しても消費は「最終的に成功した1回分」だけ。`assign_categories` はバッチ間に待機を入れて TPM(8000) 超過を予防。413 は再試行しても無駄なので即送出（＝プロンプトを小さくする側で対処）。成功後の JSON 破損はここでは再試行しない。
 
 ## デプロイ
 

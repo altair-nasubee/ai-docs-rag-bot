@@ -91,7 +91,7 @@ AI に毎回マニュアル全文を読ませると遅く・高コストにな�
 | ------------ | ----------------------------------------------------------------- | ----------------------------- | ------------------ |
 | 画面（フロント）     | Streamlit                                                         | チャット画面・カテゴリ選択 UI              | 無料                 |
 | 連携の土台        | LangChain                                                         | 検索〜回答生成の処理をつなぐ                | 無料（OSS）            |
-| 回答生成 AI      | Groq `llama-3.3-70b-versatile`（`ChatGroq`）                        | 質問への日本語回答を生成                  | 無料枠                |
+| 回答生成 AI      | Groq `openai/gpt-oss-120b`（`ChatGroq`）                            | 質問への日本語回答を生成                  | 無料枠                |
 | 検索用 AI（埋め込み） | ローカル ONNX `intfloat/multilingual-e5-small`（fastembed・384次元・多言語）   | 文章を数値ベクトル化して検索                | 無料（ローカル・キー/クォータ不要） |
 | データベース       | Chroma（ベクトルDB）                                                    | ドキュメントを検索可能な形で保存              | 無料（ローカル）           |
 | 取得           | requests                                                          | 公式 `.md` ドキュメントの取得（HTMLパース不要） | 無料（OSS）            |
@@ -111,7 +111,8 @@ AI に毎回マニュアル全文を読ませると遅く・高コストにな�
 
 - **完全無料枠で運用**: LLM は Groq 無料枠、埋め込みは**ローカル ONNX（無料・キー/クォータ不要）**。
 - **使用モデルの既定と選定理由**:
-  - **回答 LLM: Groq `llama-3.3-70b-versatile`**（安定の本番モデル・日本語回答が良好・128k コンテキストで RAG 向き）。`GROQ_MODEL` で切替可能。代替: 日本語重視なら `qwen3-32b`、高速/制限回避なら `llama-3.1-8b-instant`。preview 系（`kimi-k2` 等）は終了リスクがあり既定にしない。
+  - **回答 LLM: Groq `openai/gpt-oss-120b`**（Groq がホストするオープンウェイトモデル。`GROQ_API_KEY` のみで利用可・OpenAI キー不要）。`GROQ_MODEL` で切替可能。代替: 多言語重視なら `qwen/qwen3.6-27b`（Preview）、軽量/高速なら `openai/gpt-oss-20b`。
+    - **（旧既定）`llama-3.3-70b-versatile`**: 安定の本番モデルとして採用していたが、Groq が 2026-08-16 に無料/開発者ティア向けの提供を終了し、リクエストが 404（`model_not_found`）を返すようになったため、公式が案内する移行先 `openai/gpt-oss-120b` へ変更した。preview 系（`kimi-k2` 等）は終了リスクがあり既定にしない。
   - **埋め込み: ローカル ONNX `intfloat/multilingual-e5-small`（fastembed・384次元）**。100以上の言語に対応し、**日本語質問↔英語ドキュメントのクロスリンガル検索**に最適。**API キー・クォータ・レート制限が無く**、Gemini 無料枠の 429 で初回ビルドが詰まる問題を根治。onnxruntime は chromadb 依存で同梱済み。e5 系は取り込み=`passage:` 、質問=`query:`  のプレフィックスが必須で、取得ベクトルは L2 正規化する。`EMBED_MODEL` で切替可能（例: プレフィックス不要の `paraphrase-multilingual-MiniLM-L12-v2`）。
     - **（旧案）Gemini `gemini-embedding-001`（768次元）**: クロスリンガルは良好だったが、無料枠の埋め込みクォータ（毎分100・日次上限）が初回フルビルドの律速になり断念。
 - **無料枠の制約を設計に反映**:
@@ -249,7 +250,7 @@ AI に毎回マニュアル全文を読ませると遅く・高コストにな�
 #### STEP 1: プロジェクト初期化 ✅ 完了
 
 - [x] `requirements.txt` を作成（streamlit, langchain, langchain-groq, langchain-google-genai, langchain-community, langchain-chroma, langchain-text-splitters, chromadb, requests, python-dotenv）。※ `.md` を直接取得するため HTML パーサ（beautifulsoup4）は不要。
-- [x] `.env.example` を作成（最終形は `GROQ_API_KEY`, `GROQ_MODEL`=既定 `llama-3.3-70b-versatile`, `EMBED_MODEL`=既定 `intfloat/multilingual-e5-small`, `EMBED_DIM`=既定 `384`。埋め込みはローカルのため `GOOGLE_API_KEY` は不要）。
+- [x] `.env.example` を作成（最終形は `GROQ_API_KEY`, `GROQ_MODEL`=既定 `openai/gpt-oss-120b`（旧 `llama-3.3-70b-versatile` は 2026-08-16 に終了）, `EMBED_MODEL`=既定 `intfloat/multilingual-e5-small`, `EMBED_DIM`=既定 `384`。埋め込みはローカルのため `GOOGLE_API_KEY` は不要）。
 - [x] `.gitignore` を作成（`.env`, `.streamlit/secrets.toml` を除外）。※ 既存の Python 用 `.gitignore` に該当除外あり。`.streamlit/secrets.toml.example` も追加。
 - [x] `config.py` を作成（`os.getenv` と `st.secrets` の両対応でキー・モデル名・パスを返す）。`EMBED_BATCH_SIZE`・`RETRIEVAL_K`・プレフィックス等も集約（旧 Gemini throttle 用設定は撤去）。
 - [x] 仮想環境を作り `pip install -r requirements.txt` で動作確認（Python 3.11.15・streamlit 1.58.0 等インストール済み）。

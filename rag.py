@@ -85,6 +85,10 @@ class RagEngine:
             model=config.GROQ_MODEL,
             api_key=config.require("GROQ_API_KEY"),
             temperature=0,
+            # 推論モデル（gpt-oss 系）で回答が途中で切れないよう上限を確保し、
+            # 思考は最小限に抑えて応答を速く・簡潔にする。
+            max_tokens=config.GROQ_MAX_TOKENS,
+            reasoning_effort=config.GROQ_REASONING_EFFORT or None,
         )
         manifest = load_manifest() or {}
         self._categories: List[dict] = manifest.get("categories", [])

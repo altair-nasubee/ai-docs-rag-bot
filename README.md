@@ -71,7 +71,7 @@ tags:
 | 言語 | Python 3.11 |
 | フロント | Streamlit |
 | RAG 連携 | LangChain |
-| 回答生成 LLM | Groq `llama-3.3-70b-versatile`（無料枠） |
+| 回答生成 LLM | Groq `openai/gpt-oss-120b`（無料枠・Groq ホスト。`GROQ_API_KEY` のみで利用） |
 | 埋め込み（検索） | **ローカル ONNX** `intfloat/multilingual-e5-small`（fastembed・384次元・多言語） |
 | ベクトルDB | Chroma |
 | 取得 | requests（公式 `llms.txt` から `.md` を直接取得） |

@@ -20,6 +20,7 @@ import hashlib
 import json
 import re
 import shutil
+import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple
@@ -111,7 +112,70 @@ def _chat_model() -> ChatGroq:
         model=config.GROQ_MODEL,
         api_key=config.require("GROQ_API_KEY"),
         temperature=0,
+        # 推論モデル（gpt-oss 系）で出力が途中で切れないよう上限を確保しつつ、
+        # 大きすぎると TPM 上限に対し 413 になるため config で調整（既定2048）。
+        max_tokens=config.GROQ_MAX_TOKENS,
+        reasoning_effort=config.GROQ_REASONING_EFFORT or None,
     )
+
+
+# カテゴリ体系生成のプロンプトに載せる各ページ説明文の最大文字数。
+# 全ページを1リクエストに詰めるため、無料枠 TPM(8000) を超えないよう説明を短縮する。
+# 60文字なら全191ページで prompt≒4,000トークン（+ max_tokens 2048 で 8000 内）。
+_DESC_LIMIT = 60
+
+
+def _page_listing(pages: List[Page], numbered: bool = False) -> str:
+    """ページ一覧を LLM プロンプト用の短い箇条書きにする（説明文は短縮）。"""
+    lines: List[str] = []
+    for i, p in enumerate(pages):
+        desc = (p.description or "")[:_DESC_LIMIT].rstrip()
+        head = f"{i}. " if numbered else "- "
+        lines.append(f"{head}{p.title}: {desc}" if desc else f"{head}{p.title}")
+    return "\n".join(lines)
+
+
+def _retry_after_seconds(exc: Exception) -> Optional[float]:
+    """Groq の 429 応答に含まれる Retry-After（待つべき秒数）を取り出す。"""
+    resp = getattr(exc, "response", None)
+    headers = getattr(resp, "headers", None)
+    if not headers:
+        return None
+    val = headers.get("retry-after")
+    try:
+        return float(val) if val is not None else None
+    except (TypeError, ValueError):
+        return None
+
+
+def _invoke_with_retry(prompt: str, retries: int = 4):
+    """Groq 呼び出しを行い、レート制限(429)のみ最小限だけ再試行する。
+
+    - 429 で拒否された呼び出しはトークンを消費しない（生成が行われないため）。
+      よって再試行しても枠は「最終的に成功した1回分」しか消費しない。
+    - 待機は Groq の Retry-After を優先（最短で復帰し、無駄な試行を減らす）。
+    - 413（Request too large）は待っても解決しないので即送出（＝プロンプトを
+      小さくする側で対処する）。成功後の JSON 破損はここでは再試行しない。
+    """
+    last_exc: Optional[Exception] = None
+    for attempt in range(retries):
+        try:
+            return _chat_model().invoke(prompt)
+        except Exception as exc:  # noqa: BLE001
+            status = getattr(exc, "status_code", None)
+            if status == 413:  # サイズ超過は再試行しても無意味
+                raise
+            last_exc = exc
+            wait = _retry_after_seconds(exc)
+            if wait is None:  # ヘッダーが無い時だけ控えめなバックオフ
+                wait = min(60.0, 15.0 * (attempt + 1))
+            print(
+                f"      Groq 呼び出し失敗（{status or type(exc).__name__}）。"
+                f"{wait:.0f}s 待機して再試行 ({attempt + 1}/{retries})…",
+                flush=True,
+            )
+            time.sleep(wait)
+    raise last_exc  # type: ignore[misc]
 
 
 def _extract_json(text: str) -> dict:
@@ -140,7 +204,7 @@ def generate_taxonomy(pages: List[Page]) -> List[dict]:
 
     返り値: [{"name": str, "description": str, "examples": [str, ...]}, ...]
     """
-    listing = "\n".join(f"- {p.title}: {p.description}" for p in pages)
+    listing = _page_listing(pages)
     n_hint = max(3, min(12, round(len(pages) / 12) + 3))
     prompt = (
         "あなたは技術ドキュメントの情報設計の専門家です。"
@@ -156,7 +220,7 @@ def generate_taxonomy(pages: List[Page]) -> List[dict]:
         '"examples": ["質問例1", "質問例2"]}]}\n\n'
         f"=== ページ一覧 ===\n{listing}"
     )
-    resp = _chat_model().invoke(prompt)
+    resp = _invoke_with_retry(prompt)
     data = _extract_json(resp.content if hasattr(resp, "content") else str(resp))
     categories = data.get("categories", [])
     # 保険: 指示に反して catch-all（その他/Other 等）が生成されても除外する。
@@ -179,11 +243,10 @@ def assign_categories(
     """
     assignments: Dict[str, str] = {}
     names_block = "\n".join(f"- {n}" for n in category_names)
-    for start in range(0, len(pages), batch_size):
+    starts = list(range(0, len(pages), batch_size))
+    for bi, start in enumerate(starts):
         batch = pages[start : start + batch_size]
-        listing = "\n".join(
-            f"{i}. {p.title}: {p.description}" for i, p in enumerate(batch)
-        )
+        listing = _page_listing(batch, numbered=True)
         prompt = (
             "次のカテゴリ一覧のいずれかに、各ページを1つだけ割当ててください。\n"
             "カテゴリ名は一覧の表記と完全に一致させること。\n\n"
@@ -191,7 +254,7 @@ def assign_categories(
             f"=== ページ（番号付き）===\n{listing}\n\n"
             '出力は次の JSON のみ: {"assignments": {"0": "カテゴリ名", "1": "カテゴリ名"}}'
         )
-        resp = _chat_model().invoke(prompt)
+        resp = _invoke_with_retry(prompt)
         data = _extract_json(resp.content if hasattr(resp, "content") else str(resp))
         mapping = data.get("assignments", {})
         for i, page in enumerate(batch):
@@ -199,6 +262,9 @@ def assign_categories(
             if name not in category_names:
                 name = category_names[0]  # 不正な割当ては先頭カテゴリへフォールバック
             assignments[page.url] = name
+        # 無料枠 TPM(8000) に配慮し、連続バッチの間隔を空けて 429 を避ける。
+        if bi < len(starts) - 1:
+            time.sleep(10)
     return assignments
 
 
